@@ -29,3 +29,15 @@ Work with a database
 
 Seed the data by creating a new class in Model with data inside
 - Modify the Program.cs file to add the seed initializer
+
+Modify the display of database type by modifying in Model file
+
+The anchor tag helper supports generating html element. Passing the action and id
+
+Call GET for edit to create a form and POST to submit and change the data
+
+[Bind] protect against over-posting. Include properties want to change
+
+ValidateAntiForgeryToken created by edit view file and check if match with the Edit POST
+
+Trong View phải dùng đúng model, tag helper supports rendering
