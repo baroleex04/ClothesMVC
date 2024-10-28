@@ -10,6 +10,7 @@ namespace ClothesMVC.Models
         public string Name { get; set; }
         public string? Size { get; set; }
         public string? Brand { get; set; }
+        public string? Condition { get; set; }
         public byte[]? Image { get; set; }
         [Display(Name="Date Buy")]
         [DataType(DataType.Date)]

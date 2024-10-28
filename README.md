@@ -41,3 +41,27 @@ Call GET for edit to create a form and POST to submit and change the data
 ValidateAntiForgeryToken created by edit view file and check if match with the Edit POST
 
 Trong View phải dùng đúng model, tag helper supports rendering
+
+SEARCH
+Add Search: search by name of the items, LINQ query for select the movies
+
+Can change the parameter name to id to be the default parameter
+
+Search method can affect with the bool notUsed to overload for Index method, no modify data so don't need for validate the token
+
+If want to show the query URL then change the request in form to GET method
+
+Search information only brings to the URL with form field value and GET method
+
+SEARCH BY AN ATTRIBUTE
+Add a Model to Models folder
+Modify Index method in Controller
+Add the search by type to Index view
+model => model.Clothes![0].type : null forgiving
+select: create a list for picking the type of items
+
+ADD A NEW FIELD
+Order: add -> migrate 
+Change the data with code first migration
+
+ADD VALIDATION

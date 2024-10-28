@@ -20,10 +20,43 @@ namespace ClothesMVC.Controllers
         }
 
         // GET: Clothes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string clothesType, string searchString)
         {
-            return View(await _context.Clothes.ToListAsync());
+            if (_context.Clothes == null)
+            {
+                return Problem("Entity set 'ClothesMVC' is null");
+            }
+
+            // use LINQ to get list of types
+            IQueryable<string> typeQuery = from c in _context.Clothes
+                                           orderby c.Type
+                                           select c.Type;
+            var clothes = from c in _context.Clothes
+                          select c;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                clothes = clothes.Where(c => c.Name!.ToUpper().Contains(searchString.ToUpper()));
+            }
+            if (!string.IsNullOrEmpty(clothesType))
+            {
+                clothes = clothes.Where(c => c.Type == clothesType);
+            }
+
+            var clothesTypeVM = new ClothesTypeViewModel
+            {
+                Types = new SelectList(await typeQuery.Distinct().ToListAsync()),
+                Clothes = await clothes.ToListAsync()
+            };
+
+            return View(clothesTypeVM);
         }
+
+        //[HttpPost]
+        //public string Index(string searchString, bool notUsed)
+        //{
+        //    return "From [HttpPost]Index: filter on " + searchString;
+        //} // POST: hide the parameter in URL
 
         // GET: Clothes/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -54,7 +87,7 @@ namespace ClothesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,Name,Size,Brand,Image,DateBuy,Price")] Clothes clothes)
+        public async Task<IActionResult> Create([Bind("Id,Type,Name,Size,Brand,Condition,Image,DateBuy,Price")] Clothes clothes)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +119,7 @@ namespace ClothesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Name,Size,Brand,Image,DateBuy,Price")] Clothes clothes)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Name,Size,Brand,Condition,Image,DateBuy,Price")] Clothes clothes)
         {
             if (id != clothes.Id)
             {
