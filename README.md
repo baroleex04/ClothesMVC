@@ -65,3 +65,17 @@ Order: add -> migrate
 Change the data with code first migration
 
 ADD VALIDATION
+Validation by using requirement in Model file
+
+Delete Method
+- Have to add a new method name for HttpPost but with the action name the same
+- Or we can add an extra method to overload the existing method
+
+Uploading images
+- Using the filepath and filedata
+- Update the Model Image to string
+- Update the Controller Create method adding a parameter of IFormFile Image
+- Create a web host environment
+- Change the View of Create method
+- For the src: remember to add @
+- Modify the edit view to update the image

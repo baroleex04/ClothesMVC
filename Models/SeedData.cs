@@ -26,7 +26,7 @@ public static class SeedData
                     Name = "Mizuno 123",
                     Size = "44",
                     Brand = "Mizuno",
-                    Condition = "10",
+                    Condition = 10,
                     DateBuy = DateTime.Now,
                     Price = 1500000
                 },
@@ -36,7 +36,7 @@ public static class SeedData
                     Name = "New 123",
                     Size = "XXL",
                     Brand = "Uniqlo",
-                    Condition = "9",
+                    Condition = 9,
                     DateBuy = DateTime.Parse("2023-12-12"),
                     Price = 2000000
                 },
@@ -46,7 +46,7 @@ public static class SeedData
                     Name = "The Best",
                     Size = "XL",
                     Brand = "GrimmDC",
-                    Condition = "10",
+                    Condition = 10,
                     DateBuy = DateTime.Now,
                     Price = 400000
                 },
@@ -56,7 +56,7 @@ public static class SeedData
                     Name = "New brand",
                     Size = "44",
                     Brand = "Yonex",
-                    Condition = "10",
+                    Condition = 10,
                     DateBuy = DateTime.Now,
                     Price = 10000
                 }

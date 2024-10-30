@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 using ClothesMVC.Data;
 using ClothesMVC.Models;
 
@@ -13,10 +14,12 @@ namespace ClothesMVC.Controllers
     public class ClothesController : Controller
     {
         private readonly ClothesMVCContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ClothesController(ClothesMVCContext context)
+        public ClothesController(ClothesMVCContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Clothes
@@ -87,10 +90,35 @@ namespace ClothesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,Name,Size,Brand,Condition,Image,DateBuy,Price")] Clothes clothes)
+        public async Task<IActionResult> Create([Bind("Id,Type,Name,Size,Brand,Condition,DateBuy,Price")] Clothes clothes, IFormFile Image)
         {
+            if (Image == null)
+            {
+                ModelState.AddModelError("Image", "Please choose an image to upload.");
+            }
             if (ModelState.IsValid)
             {
+                if (Image != null && Image.Length > 0)
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(Image.FileName);
+                    var extension = Path.GetExtension(Image.FileName);
+                    var uniqueFileName = $"{fileName}_{DateTime.Now.Ticks}{extension}";
+                    var uploads = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+
+                    if (!Directory.Exists(uploads))
+                    {
+                        Directory.CreateDirectory(uploads);
+                    }
+
+                    var filePath = Path.Combine(uploads, uniqueFileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Image.CopyToAsync(fileStream);
+                    }
+
+                    clothes.Image = $"/images/{uniqueFileName}";
+                }
+
                 _context.Add(clothes);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -119,7 +147,7 @@ namespace ClothesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Name,Size,Brand,Condition,Image,DateBuy,Price")] Clothes clothes)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Name,Size,Brand,Condition,DateBuy,Price")] Clothes clothes, IFormFile Image)
         {
             if (id != clothes.Id)
             {
@@ -130,6 +158,34 @@ namespace ClothesMVC.Controllers
             {
                 try
                 {
+                    if (Image != null && Image.Length > 0)
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(Image.FileName);
+                        var extension = Path.GetExtension(Image.FileName);
+                        var uniqueFileName = $"{fileName}_{DateTime.Now.Ticks}{extension}";
+                        var uploads = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+
+                        if (!Directory.Exists(uploads))
+                        {
+                            Directory.CreateDirectory(uploads);
+                        }
+
+                        var filePath = Path.Combine(uploads, uniqueFileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await Image.CopyToAsync(fileStream);
+                        }
+                        if (!string.IsNullOrEmpty(clothes.Image))
+                        {
+                            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, clothes.Image.TrimStart('/'));
+                            if (System.IO.File.Exists(oldImagePath))
+                            {
+                                System.IO.File.Delete(oldImagePath);
+                            }
+                        }
+
+                        clothes.Image = $"/images/{uniqueFileName}";
+                    }
                     _context.Update(clothes);
                     await _context.SaveChangesAsync();
                 }

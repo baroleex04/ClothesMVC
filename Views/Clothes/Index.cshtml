@@ -75,7 +75,14 @@
                 @Html.DisplayFor(modelItem => item.Condition)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Image)
+                    @if (!string.IsNullOrEmpty(item.Image))
+                    {
+                        <img src="@item.Image" alt="Uploaded Image" width="100" />
+                    }
+                    else
+                    {
+                        <p>No image available</p>
+                    }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DateBuy)
