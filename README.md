@@ -78,4 +78,5 @@ Uploading images
 - Create a web host environment
 - Change the View of Create method
 - For the src: remember to add @
-- Modify the edit view to update the image
+- Modify the edit view to update the image: after change the image, delete the old image
+- 

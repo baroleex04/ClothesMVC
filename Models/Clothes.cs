@@ -21,10 +21,8 @@ namespace ClothesMVC.Models
         [Display(Name="Date Buy")]
         [DataType(DataType.Date)]
         public DateTime DateBuy { get; set; }
-        [Range(1,1000)]
-        [DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(10,0)")]
-        [DisplayFormat(DataFormatString = "{0:C0}")]
-        public decimal Price { get; set; }
+        [Range(1000,10000000)]
+        [DisplayFormat(DataFormatString = "{0:N0}", ApplyFormatInEditMode = false)]
+        public int Price { get; set; }
     }
 }

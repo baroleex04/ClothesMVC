@@ -143,11 +143,9 @@ namespace ClothesMVC.Controllers
         }
 
         // POST: Clothes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Name,Size,Brand,Condition,DateBuy,Price")] Clothes clothes, IFormFile Image)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Name,Size,Brand,Condition,DateBuy,Price")] Clothes clothes, IFormFile? Image)
         {
             if (id != clothes.Id)
             {
@@ -158,8 +156,16 @@ namespace ClothesMVC.Controllers
             {
                 try
                 {
+                    // Get the existing clothes item from the database to retain its current image if no new image is uploaded
+                    var existingClothes = await _context.Clothes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+                    if (existingClothes == null)
+                    {
+                        return NotFound();
+                    }
+
                     if (Image != null && Image.Length > 0)
                     {
+                        // Process new image upload
                         var fileName = Path.GetFileNameWithoutExtension(Image.FileName);
                         var extension = Path.GetExtension(Image.FileName);
                         var uniqueFileName = $"{fileName}_{DateTime.Now.Ticks}{extension}";
@@ -175,17 +181,17 @@ namespace ClothesMVC.Controllers
                         {
                             await Image.CopyToAsync(fileStream);
                         }
-                        if (!string.IsNullOrEmpty(clothes.Image))
-                        {
-                            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, clothes.Image.TrimStart('/'));
-                            if (System.IO.File.Exists(oldImagePath))
-                            {
-                                System.IO.File.Delete(oldImagePath);
-                            }
-                        }
 
+                        await DeleteOldImages(id); // Optionally delete the old image if a new one is uploaded
                         clothes.Image = $"/images/{uniqueFileName}";
                     }
+                    else
+                    {
+                        // Retain existing image if no new image is uploaded
+                        clothes.Image = existingClothes.Image;
+                    }
+
+                    // Update the clothes object in the database
                     _context.Update(clothes);
                     await _context.SaveChangesAsync();
                 }
@@ -203,6 +209,25 @@ namespace ClothesMVC.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(clothes);
+        }
+
+
+        private async Task DeleteOldImages(int id)
+        { // prevent tracking
+            var imagePath = await _context.Clothes
+                .AsNoTracking()
+                .Where(c => c.Id == id)
+                .Select(c => c.Image)
+                .FirstOrDefaultAsync();
+
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, imagePath.TrimStart('/'));
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+            }
         }
 
         // GET: Clothes/Delete/5

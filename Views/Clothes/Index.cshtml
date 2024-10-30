@@ -51,7 +51,7 @@
                 @Html.DisplayNameFor(model => model.Clothes![0].DateBuy)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Clothes![0].Price)
+                @Html.DisplayNameFor(model => model.Clothes![0].Price) (VND)
             </th>
             <th></th>
         </tr>
@@ -88,7 +88,7 @@
                 @Html.DisplayFor(modelItem => item.DateBuy)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
+                @Html.DisplayFor(modelItem => item.Price) 
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
