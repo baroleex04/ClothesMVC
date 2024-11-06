@@ -23,17 +23,14 @@ namespace ClothesMVC.Controllers
         }
 
         // GET: Clothes
-        public async Task<IActionResult> Index(string clothesType, string searchString)
+        public async Task<IActionResult> Index(ClothingType? clothesType, string searchString)
         {
             if (_context.Clothes == null)
             {
                 return Problem("Entity set 'ClothesMVC' is null");
             }
 
-            // use LINQ to get list of types
-            IQueryable<string> typeQuery = from c in _context.Clothes
-                                           orderby c.Type
-                                           select c.Type;
+            var typeQuery = Enum.GetNames(typeof(ClothingType)).AsQueryable();
             var clothes = from c in _context.Clothes
                           select c;
 
@@ -41,14 +38,14 @@ namespace ClothesMVC.Controllers
             {
                 clothes = clothes.Where(c => c.Name!.ToUpper().Contains(searchString.ToUpper()));
             }
-            if (!string.IsNullOrEmpty(clothesType))
+            if (clothesType.HasValue)
             {
                 clothes = clothes.Where(c => c.Type == clothesType);
             }
 
             var clothesTypeVM = new ClothesTypeViewModel
             {
-                Types = new SelectList(await typeQuery.Distinct().ToListAsync()),
+                Types = new SelectList(typeQuery),
                 Clothes = await clothes.ToListAsync()
             };
 
@@ -82,6 +79,11 @@ namespace ClothesMVC.Controllers
         // GET: Clothes/Create
         public IActionResult Create()
         {
+            ViewBag.TypeOptions = new SelectList(Enum.GetValues(typeof(ClothingType)).Cast<ClothingType>().Select(e => new SelectListItem
+            {
+                Value = ((int)e).ToString(),
+                Text = e.ToString()
+            }).ToList(), "Value", "Text");
             return View();
         }
 
@@ -133,6 +135,11 @@ namespace ClothesMVC.Controllers
             {
                 return NotFound();
             }
+            ViewBag.TypeOptions = new SelectList(Enum.GetValues(typeof(ClothingType)).Cast<ClothingType>().Select(e => new SelectListItem
+            {
+                Value = ((int)e).ToString(),
+                Text = e.ToString()
+            }).ToList(), "Value", "Text");
 
             var clothes = await _context.Clothes.FindAsync(id);
             if (clothes == null)

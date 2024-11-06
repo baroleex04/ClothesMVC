@@ -22,7 +22,7 @@ public static class SeedData
             context.Clothes.AddRange(
                 new Clothes
                 {
-                    Type = "Shoes",
+                    Type = ClothingType.Shoes,
                     Name = "Mizuno 123",
                     Size = "44",
                     Brand = "Mizuno",
@@ -32,7 +32,7 @@ public static class SeedData
                 },
                 new Clothes
                 {
-                    Type = "Shirt",
+                    Type = ClothingType.Top,
                     Name = "New 123",
                     Size = "XXL",
                     Brand = "Uniqlo",
@@ -42,7 +42,7 @@ public static class SeedData
                 },
                 new Clothes
                 {
-                    Type = "Shorts",
+                    Type = ClothingType.Bottom,
                     Name = "The Best",
                     Size = "XL",
                     Brand = "GrimmDC",
@@ -52,7 +52,7 @@ public static class SeedData
                 },
                 new Clothes
                 {
-                    Type = "Socks",
+                    Type = ClothingType.Shoes,
                     Name = "New brand",
                     Size = "44",
                     Brand = "Yonex",

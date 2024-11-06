@@ -3,12 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesMVC.Models
 {
+    public enum ClothingType
+    {
+        Top,
+        Bottom,
+        Outerware,
+        Shoes,
+        Accessories
+    }
     public class Clothes
     {
         public int Id { get; set; }
-        [StringLength(10, MinimumLength = 2)]
         [Required]
-        public string? Type { get; set; }
+        public ClothingType? Type { get; set; }
         [StringLength(20, MinimumLength = 2)]
         [Required]
         public string Name { get; set; }
