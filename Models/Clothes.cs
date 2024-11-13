@@ -11,6 +11,7 @@ namespace ClothesMVC.Models
         Shoes,
         Accessories
     }
+
     public class Clothes
     {
         public int Id { get; set; }
@@ -21,15 +22,16 @@ namespace ClothesMVC.Models
         public string Name { get; set; }
         public string? Size { get; set; }
         public string? Brand { get; set; }
-        [Range(0,10)]
+        [Range(0, 10)]
         public int? Condition { get; set; }
         [DataType(DataType.Upload)]
         public string? Image { get; set; }
-        [Display(Name="Date Buy")]
+        [Display(Name = "Date Buy")]
         [DataType(DataType.Date)]
-        public DateTime DateBuy { get; set; }
-        [Range(1000,10000000)]
+        public DateTime DateBuy { get; set; } = DateTime.Now;
+        [Range(1000, 10000000)]
         [DisplayFormat(DataFormatString = "{0:N0}", ApplyFormatInEditMode = false)]
         public int Price { get; set; }
+        public string? UserId { get; set; }
     }
 }

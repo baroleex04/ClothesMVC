@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using ClothesMVC.Data;
 using ClothesMVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace ClothesMVC.Controllers
 {
@@ -22,9 +24,24 @@ namespace ClothesMVC.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        // GET: Login
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        // GET: Privacy
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
         // GET: Clothes
+        [Authorize]
         public async Task<IActionResult> Index(ClothingType? clothesType, string searchString)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+
             if (_context.Clothes == null)
             {
                 return Problem("Entity set 'ClothesMVC' is null");
@@ -32,6 +49,7 @@ namespace ClothesMVC.Controllers
 
             var typeQuery = Enum.GetNames(typeof(ClothingType)).AsQueryable();
             var clothes = from c in _context.Clothes
+                          where c.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier) // will give the user's userId
                           select c;
 
             if (!string.IsNullOrEmpty(searchString))
@@ -59,6 +77,7 @@ namespace ClothesMVC.Controllers
         //} // POST: hide the parameter in URL
 
         // GET: Clothes/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -77,6 +96,7 @@ namespace ClothesMVC.Controllers
         }
 
         // GET: Clothes/Create
+        [Authorize]
         public IActionResult Create()
         {
             ViewBag.TypeOptions = new SelectList(Enum.GetValues(typeof(ClothingType)).Cast<ClothingType>().Select(e => new SelectListItem
@@ -117,9 +137,9 @@ namespace ClothesMVC.Controllers
                     {
                         await Image.CopyToAsync(fileStream);
                     }
-
                     clothes.Image = $"/images/{uniqueFileName}";
                 }
+                clothes.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
 
                 _context.Add(clothes);
                 await _context.SaveChangesAsync();
@@ -129,6 +149,7 @@ namespace ClothesMVC.Controllers
         }
 
         // GET: Clothes/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -150,6 +171,7 @@ namespace ClothesMVC.Controllers
         }
 
         // POST: Clothes/Edit/5
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Name,Size,Brand,Condition,DateBuy,Price")] Clothes clothes, IFormFile? Image)
@@ -218,7 +240,7 @@ namespace ClothesMVC.Controllers
             return View(clothes);
         }
 
-
+        [Authorize]
         private async Task DeleteOldImages(int id)
         { // prevent tracking
             var imagePath = await _context.Clothes
@@ -238,6 +260,7 @@ namespace ClothesMVC.Controllers
         }
 
         // GET: Clothes/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -256,6 +279,7 @@ namespace ClothesMVC.Controllers
         }
 
         // POST: Clothes/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -270,6 +294,7 @@ namespace ClothesMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize]
         private bool ClothesExists(int id)
         {
             return _context.Clothes.Any(e => e.Id == id);
